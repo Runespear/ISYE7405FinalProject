@@ -17,10 +17,11 @@ rm(list=ls())
 
 # Load Necessry Packages, use require("pacman") if you don't have it
 library("pacman")
-p_load("readr","dplyr","stringr","rstudioapi","parallel","xtable")
+p_load("readr","dplyr","stringr","rstudioapi","parallel","xtable","here")
 
 # Set working directory to this script's location for RSTUDIO only
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+#setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+setwd(here())
 
 # Start Clock 
 ptm <- proc.time()
@@ -29,8 +30,12 @@ ptm <- proc.time()
 # Data Processing
 #################################################################
 
+# Set path to data folder
+DATAFOLDERPATH = "./data/"
+
 # Read Data
-TaxiData = read_csv(file = 'train.csv')
+TaxiDataPath = file.path(DATAFOLDERPATH,"train.csv")
+TaxiData = read_csv(file = TaxiDataPath)
 
 # POLYLINE has GPS ticks every 15 min
 # We count number of ticks by number of commas
