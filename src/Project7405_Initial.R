@@ -67,6 +67,25 @@ summary.data <- aggregate(NewTaxiData[,c("TotalTime","vones")],list(NewTaxiData$
 summary.data$TotalRides <- summary.data$vones
 summary.data$vones <- NULL
 
+
+####################################################
+# Plot histogram of service time distribution Fig4
+####################################################
+
+p<-NewTaxiData %>% 
+  mutate(x_new = ifelse(TotalTime > 60, 60, TotalTime)) %>% 
+  ggplot(aes(x_new)) +
+  geom_histogram(binwidth = 1, col = "black", fill = "cornflowerblue") + 
+  labs(title = "Service Time Distribution",subtitle=">60 binned to 60") + xlab("Service Time/min") + ylab("Count")
+png(file.path(OUTPUTFOLDERPATH,"Fig4.png"),width=1080,height=720,type="cairo")
+print(p)
+dev.off()
+
+#########################################################################
+# Generate Table II: Max,Min,Mean,SD of TotalRides and TotalTime
+##########################################################################
+
+
 TotalTimePD = summary.data$TotalTime
 TotalRidesPD = summary.data$TotalRides
 
@@ -75,9 +94,6 @@ mTRPD = mean(TotalRidesPD)
 sdTTPD = sd(TotalTimePD)
 sdTRPD = sd(TotalRidesPD)
 
-#########################################################################
-# Generate Table II: Max,Min,Mean,SD of TotalRides and TotalTime
-##########################################################################
 TableII.TotalTime <- c(max(TotalTimePD), min(TotalTimePD),mTTPD,sdTTPD )
 TableII.TotalRides <- c(max(TotalRidesPD), min(TotalRidesPD),mTRPD,sdTRPD)
 TableII <- data.frame("ServicesPerDriver"=TableII.TotalRides,"TotalCruiseTime"=TableII.TotalTime)
@@ -147,18 +163,7 @@ TableI.LATEX <- xtable(TableI,digits=c(0,0,0,0,0))
 
 print(TableI.LATEX,include.rownames=TRUE,file=file.path(OUTPUTFOLDERPATH,"TableILATEX.txt"))
 
-###############################################
-# Plot histogram of service time distribution
-###############################################
 
-p<-NewTaxiData %>% 
-  mutate(x_new = ifelse(TotalTime > 60, 60, TotalTime)) %>% 
-  ggplot(aes(x_new)) +
-  geom_histogram(binwidth = 1, col = "black", fill = "cornflowerblue") + 
-  labs(title = "Service Time Distribution",subtitle=">60 binned to 60") + xlab("Service Time/min") + ylab("Count")
-png(file.path(OUTPUTFOLDERPATH,"Fig4.png"),width=1080,height=720,type="cairo")
-print(p)
-dev.off()
 
 #####################
 # Script Ends Here
