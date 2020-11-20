@@ -13,12 +13,12 @@
 #################################################################
 
 # Clear Environment
-rm(list=ls())
+#rm(list=ls())
 
 # Load Necessry Packages, use require("pacman") if you don't have it
 library("pacman")
 p_load("readr","dplyr","stringr","rstudioapi","parallel","xtable","here","anytime")
-p_load("pracma","lubridate")
+p_load("pracma","lubridate","ggplot2","tidyverse","remotes")
 
 # Set working directory to this script's location for RSTUDIO only
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -32,7 +32,8 @@ ptm <- proc.time()
 #################################################################
 
 # Set path to data folder
-DATAFOLDERPATH = "./data/"
+DATAFOLDERPATH = "./data"
+OUTPUTFOLDERPATH = "./data/output"
 
 # Create folder for output
 dir.create("./data/output",showWarnings=FALSE)
@@ -41,7 +42,9 @@ dir.create("./data/output",showWarnings=FALSE)
 # Read Data
 TaxiDataPath = file.path(DATAFOLDERPATH,"train.csv")
 TaxiData = read_csv(file = TaxiDataPath)
-
+# Remove MISSING_DATA entries, then drop
+TaxiData = TaxiData[which(!TaxiData$MISSING_DATA),]
+TaxiData$MISSING_DATA <- NULL
 # POLYLINE has GPS ticks every 15 min
 # We count number of ticks by number of commas
 # Case 0: "[]", 0 ticks, 0 commas
@@ -84,7 +87,7 @@ row.names(TableII) <- c("Max","Min","Mean","SD")
 TableII
 # Export Table in LATEX format, 0 decimal place precision 
 TableII.LATEX <- xtable(TableII,digits=c(0,0,0))
-print(TableII.LATEX,include.rownames=TRUE,file="./data/output/TableIILATEX.txt")
+print(TableII.LATEX,include.rownames=TRUE,file=file.path(OUTPUTFOLDERPATH,"TableIILATEX.txt"))
 
 
 #########################################################################
@@ -142,8 +145,20 @@ row.names(TableI) <- c("Workdays","Weekends","AllDaytypes")
 TableI.LATEX <- xtable(TableI,digits=c(0,0,0,0,0))
 
 
-print(TableI.LATEX,include.rownames=TRUE,file="./data/output/TableILATEX.txt")
+print(TableI.LATEX,include.rownames=TRUE,file=file.path(OUTPUTFOLDERPATH,"TableILATEX.txt"))
 
+###############################################
+# Plot histogram of service time distribution
+###############################################
+
+p<-NewTaxiData %>% 
+  mutate(x_new = ifelse(TotalTime > 60, 60, TotalTime)) %>% 
+  ggplot(aes(x_new)) +
+  geom_histogram(binwidth = 5, col = "black", fill = "cornflowerblue") + 
+  labs(title = "Service Time Distribution",subtitle=">60 binned to 60") + xlab("Service Time/min") + ylab("Count")
+png(file.path(OUTPUTFOLDERPATH,"Fig4.png"),width=1080,height=720,type="cairo")
+print(p)
+dev.off()
 
 #####################
 # Script Ends Here

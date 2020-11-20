@@ -1,14 +1,14 @@
 % latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Nov 19 15:50:35 2020
+% Fri Nov 20 18:51:10 2020
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrr}
   \hline
  & TotalServicesEmerged & AverageEarly & AverageMID & AverageLATE \\ 
   \hline
-Workdays & 1266162 & 588 & 1307 & 966 \\ 
-  Weekends & 444508 & 405 & 303 & 336 \\ 
-  AllDaytypes & 1710670 & 979 & 1603 & 1286 \\ 
+Workdays & 1266155 & 588 & 1307 & 966 \\ 
+  Weekends & 444505 & 405 & 303 & 336 \\ 
+  AllDaytypes & 1710660 & 979 & 1603 & 1286 \\ 
    \hline
 \end{tabular}
 \end{table}

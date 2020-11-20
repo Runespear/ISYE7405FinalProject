@@ -1,15 +1,15 @@
 % latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Nov 19 15:51:21 2020
+% Fri Nov 20 18:50:59 2020
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrr}
   \hline
  & ServicesPerDriver & TotalCruiseTime \\ 
   \hline
-Max & 10746 & 118919 \\ 
+Max & 10746 & 118848 \\ 
   Min & 1 & 0 \\ 
   Mean & 3818 & 46545 \\ 
-  SD & 1644 & 18884 \\ 
+  SD & 1644 & 18883 \\ 
    \hline
 \end{tabular}
 \end{table}
