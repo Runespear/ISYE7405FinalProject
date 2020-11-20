@@ -154,7 +154,7 @@ print(TableI.LATEX,include.rownames=TRUE,file=file.path(OUTPUTFOLDERPATH,"TableI
 p<-NewTaxiData %>% 
   mutate(x_new = ifelse(TotalTime > 60, 60, TotalTime)) %>% 
   ggplot(aes(x_new)) +
-  geom_histogram(binwidth = 5, col = "black", fill = "cornflowerblue") + 
+  geom_histogram(binwidth = 1, col = "black", fill = "cornflowerblue") + 
   labs(title = "Service Time Distribution",subtitle=">60 binned to 60") + xlab("Service Time/min") + ylab("Count")
 png(file.path(OUTPUTFOLDERPATH,"Fig4.png"),width=1080,height=720,type="cairo")
 print(p)
