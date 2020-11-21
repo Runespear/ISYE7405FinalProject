@@ -5,7 +5,7 @@
 # Data files
 *.csv
 
-!/data/chunks
+!/data/chunks/*
 # zip files
 *.zip
 
