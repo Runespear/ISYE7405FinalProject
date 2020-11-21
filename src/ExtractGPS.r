@@ -54,7 +54,7 @@ for (i in 1:nm){
 
 NewDataXY=data.frame(NewTaxiDataFiltered,Xstart,Xend,Ystart,Yend)
 NewDataXY$POLYLINE<- NULL
-write_csv(NewDataXY,file.path(DATAFOLDERPATH,"NewDataXY.csv"))
+#write_csv(NewDataXY,file.path(DATAFOLDERPATH,"NewDataXY.csv"))
 
 nr <- nrow(NewDataXY)
 n <- nr/6
