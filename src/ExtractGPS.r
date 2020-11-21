@@ -1,5 +1,5 @@
 ###################################################################
-# Parses Polyline in NewTaxiData.csv
+# Parses Polyline in NewTaxiDataFiltered.csv
 # Adds in start and end X,Y coordinates
 ###################################################################
 library("pacman")
@@ -14,7 +14,9 @@ ptm <- proc.time()
 ###################################################################
 DATAFOLDERPATH = "./data"
 OUTPUTPATH = file.path(DATAFOLDERPATH,"output")
+CHUNKSPATH = file.path(DATAFOLDERPATH,"chunks")
 dir.create(OUTPUTPATH,showWarnings=FALSE)
+dir.create(CHUNKSPATH,showWarnings=FALSE)
 
 ###################################################################
 numextract <- function(string){ 
@@ -22,16 +24,13 @@ numextract <- function(string){
 }
 # Create folder for output
 
-NewTaxiData = file.path(DATAFOLDERPATH,"NewTaxiData.csv")
-NewTaxiData = read_csv(file = NewTaxiData)
+NewTaxiDataFiltered = file.path(DATAFOLDERPATH,"NewTaxiDataFiltered.csv")
+NewTaxiDataFiltered = read_csv(file = NewTaxiDataFiltered)
 
-# Drop TotalTime <= 3 min
-NewTaxiData = NewTaxiData[which(NewTaxiData$TotalTime >= 3),]
-write_csv(NewTaxiData,file.path(DATAFOLDERPATH,"NewTaxiDataFiltered.csv"))
 ###################################################################
-ColPol=NewTaxiData[,'POLYLINE']
+ColPol=NewTaxiDataFiltered[,'POLYLINE']
 l=length(ColPol)
-nm=nrow(NewTaxiData)
+nm=nrow(NewTaxiDataFiltered)
 TotalTime=vector(,l)
 ####################################################################
 Xstart=rep(NA,nm)
@@ -40,7 +39,7 @@ Xend=rep(NA,nm)
 Yend=rep(NA,nm)
 for (i in 1:nm){
   #print(i)
-  A=NewTaxiData[i,'POLYLINE']
+  A=NewTaxiDataFiltered[i,'POLYLINE']
   B=str_split(A,",")
   Inter=data.frame(B)
   len=nrow(Inter)
@@ -53,12 +52,34 @@ for (i in 1:nm){
 }
 
 
-NewDataXY=data.frame(NewTaxiData,Xstart,Xend,Ystart,Yend)
+NewDataXY=data.frame(NewTaxiDataFiltered,Xstart,Xend,Ystart,Yend)
 NewDataXY$POLYLINE<- NULL
 write_csv(NewDataXY,file.path(DATAFOLDERPATH,"NewDataXY.csv"))
 
+nr <- nrow(NewDataXY)
+n <- nr/6
+k = split(NewDataXY, rep(1:ceiling(nr/n), each=n, length.out=nr))
+for (i in 1:6){
+  fname = paste("NewDataXY_part", toString(i),".csv" ,sep="")
+  write_csv(k[[i]],file.path(CHUNKSPATH,fname))
+}
+
+
+
 # Join this file with NewTaxiDataFiltered.csv after filtering < 3
-write_csv(NewDataXY[c("TRIP_ID","Xstart","Xend","Ystart","Yend")],file.path(DATAFOLDERPATH,"XYticks.csv"))
+XYticks <- NewDataXY[c("TRIP_ID","Xstart","Xend","Ystart","Yend")]
+#write_csv(XYticks,file.path(DATAFOLDERPATH,"XYticks.csv"))
+# Split file into smaller chunks
+
+
+nr <- nrow(XYticks)
+n <- nr/3
+k = split(XYticks, rep(1:ceiling(nr/n), each=n, length.out=nr))
+for (i in 1:3){
+  fname = paste("XYticks_part", toString(i),".csv" ,sep="")
+  write_csv(k[[i]],file.path(CHUNKSPATH,fname))
+}
+
 ###########################################################################
 TimeTaken <- proc.time() - ptm
 TimeTaken

@@ -82,7 +82,9 @@ NewTaxiData$LATESHIFT <- hour(NewTaxiData$DATETIME) >= 16
 
 
 write_csv(NewTaxiData,file.path(DATAFOLDERPATH,"NewTaxiData.csv"))
-
+# Filter out less than 3 minutes
+NewTaxiDataFiltered = NewTaxiData[which(NewTaxiData$TotalTime >= 3),]
+write_csv(NewTaxiDataFiltered,file.path(DATAFOLDERPATH,"NewTaxiDataFiltered.csv"))
 
 #####################
 # Script Ends Here
