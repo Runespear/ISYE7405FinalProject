@@ -71,12 +71,17 @@ summary.data$vones <- NULL
 ####################################################
 # Plot histogram of service time distribution Fig4
 ####################################################
-
-p<-NewTaxiData %>% 
-  mutate(x_new = ifelse(TotalTime > 60, 60, TotalTime)) %>% 
-  ggplot(aes(x_new)) +
-  geom_histogram(binwidth = 1, col = "black", fill = "cornflowerblue") + 
-  labs(title = "Service Time Distribution",subtitle=">60 binned to 60") + xlab("Service Time/min") + ylab("Count")
+k<- NewTaxiData %>% 
+  mutate(x_new = ifelse(TotalTime > 60, 60, TotalTime))
+k$x_new <- sort(k$x_new)
+k$x_cum <- cumsum(k$x_new/sum(k$x_new))
+ymax <- 1.55e+05
+p<- ggplot(k, aes(x_new)) +
+  geom_histogram(binwidth = 1, col = "black", fill = "cornflowerblue") +
+  labs(title = "Service Time Distribution",subtitle=">60 binned to 60") + xlab("Service Time/min") + ylab("Count") + 
+  geom_line(aes(x=x_new,y=x_cum*ymax), color="red") +
+  scale_y_continuous(name = 'Count', sec.axis = sec_axis(~./ymax, 
+                                                                   name = "Cumulative percentage [%]"))
 png(file.path(OUTPUTFOLDERPATH,"Fig4.png"),width=1080,height=720,type="cairo")
 print(p)
 dev.off()
