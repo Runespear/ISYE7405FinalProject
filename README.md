@@ -14,6 +14,13 @@ Repository for Fall 2020 ISYE 7405 Final Project
 Note that the large csv files are ignored, so the data folder should be created
 and should include the train.csv file
 
+## Workflow
+
+1. Preprocess.R -> ./data/NewTaxiDataFiltered.csv, ./data/NewTaxiData.csv
+2. ExtractGPS.R + ./data/NewTaxiDataFiltered.csv -> ./data/chunks/NewDataXY_part1, ..., ./data/chunks/NewDataXY_part6,  ./data/chunks/XYticks_part1, ./data/chunks/XYticks_part2, ./data/chunks/XYticks_part3
+3. ExtractStartingLocation.R + ./data/chunks/NewDataXY_part1, ..., ./data/chunks/NewDataXY_part6 -> ./data/chunks/STAND_LOCATIONS.csv
+4. EDAFiguresTables.R + ./data/NewTaxiData.csv -> ./data/output/FigALL.png, ./data/output/Fig4.png, ./data/output/TableIILATEX.txt, ./data/output/TableILATEX.txt
+
 ## Exploratory Questions
 
 1.	If specific locations are related to longer journeys
