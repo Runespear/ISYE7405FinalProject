@@ -37,3 +37,4 @@ summary.stands <- summary.stands  %>%
     STAND = Group.1  
   )
 write_csv(summary.stands,file.path(CHUNKSPATH,"STAND_LOCATIONS.csv"))
+write_csv(NewDataXY.file.path(DATAFOLDERPATH,"NewDataXY.csv"))
