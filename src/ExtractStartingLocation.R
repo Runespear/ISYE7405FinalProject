@@ -32,4 +32,8 @@ NewDataXY <- do.call(rbind , NewDataXY)
 #####################################################################
 
 summary.stands <- aggregate(NewDataXY[,c("Xstart","Ystart")],list(NewDataXY$ORIGIN_STAND),mean)
+summary.stands <- summary.stands  %>% 
+  rename(
+    STAND = Group.1  
+  )
 write_csv(summary.stands,file.path(CHUNKSPATH,"STAND_LOCATIONS.csv"))
