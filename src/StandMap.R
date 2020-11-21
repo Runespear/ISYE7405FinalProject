@@ -39,6 +39,9 @@ proj4string(Data) <- "+init=epsg:4326"
 #m=mapview::mapview(Data,popup="Name") 
 m <-leaflet(Data)
 m <-addTiles(m)
+#########################################################################
+# Total Trips in Red
+#########################################################################
 mc <-addCircleMarkers(m,radius=2 + 0.002*TaxiStand$TotalRides/min(TaxiStand$TotalRides),color='red')
 palette <- colorNumeric(
   palette = "YlGnBu",
@@ -49,16 +52,20 @@ my_title <- tags$p(tags$style("p {color: red; font-size:22px}"),
 
 mc<-mc %>% addControl(my_title, position = "bottomleft" )
 mapshot(mc, file = file.path(OUTPUTFOLDERPATH,"totaltrips.png"))
-
+#########################################################################
+# Total Time Taken in blue
+##########################################################################
 mk <- addCircleMarkers(m,radius=2 + 0.002*TaxiStand$TotalTime/min(TaxiStand$TotalTime),color='blue')
 my_title <- tags$p(tags$style("p {color: blue; font-size:22px}"),
                    tags$b("Total Time"))
 mk<-mk %>% addControl(my_title, position = "bottomleft" )
 mapshot(mk, file = file.path(OUTPUTFOLDERPATH,"totaltime.png"))
-
-
-#m
-#k<-leaflet() %>%addMarkers(~Longitude, ~Latitude, label=~Name, labelOptions=labelOptions(noHide=T),data=rawdata)
-#m+k
-#m@map %>%addMarkers(~Longitude, ~Latitude, label=~Name, labelOptions=labelOptions(noHide=F),data=rawdata)
+##########################################################################
+# Average Time per trip in green
+##########################################################################
+mt <- addCircleMarkers(m,radius=2 + TaxiStand$AVG_TRIP_TIME/min(TaxiStand$AVG_TRIP_TIME),color='purple')
+my_title <- tags$p(tags$style("p {color: purple; font-size:22px}"),
+                   tags$b("Average Time Per Trip"))
+mt<-mt %>% addControl(my_title, position = "bottomleft" )
+mapshot(mt, file = file.path(OUTPUTFOLDERPATH,"avgtriptime.png"))
 
