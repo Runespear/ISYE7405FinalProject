@@ -5,7 +5,7 @@
 # Data files
 *.csv
 
-!*/data/XYticks.csv
+!/data/XYticks.csv
 # zip files
 *.zip
 
