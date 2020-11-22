@@ -63,6 +63,14 @@ stand.lag <- NewDataXY %>%
   mutate(WAIT = (TIMESTAMP - lag(TIMESTAMP))/60)
 
 stand.lag <- drop_na(stand.lag,WAIT)
+nr <- nrow(stand.lag)
+n <- nr/6
+k = split(stand.lag, rep(1:ceiling(nr/n), each=n, length.out=nr))
+for (i in 1:6){
+  fname = paste("WAITINGTIMES_part", toString(i),".csv" ,sep="")
+  write_csv(k[[i]],file.path(CHUNKSFOLDERPATH,fname))
+}
+
 
 # Calculate Mean waiting times per stand
 stand.lag.summary <- aggregate(stand.lag[,c("WAIT")],list(stand.lag$ORIGIN_STAND),mean)
