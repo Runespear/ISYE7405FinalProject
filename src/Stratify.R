@@ -35,6 +35,8 @@ dir.create("./data/output",showWarnings=FALSE)
 
 # Read Data
 NewDataXY <- read_csv(file.path(DATAFOLDERPATH,"NewDataXY.csv"))
+# Drop non taxi stands
+NewDataXY <- NewDataXY[which(!is.na(NewDataXY$ORIGIN_STAND)),]
 Coordinates <- read_csv(file.path(CHUNKSFOLDERPATH,"STAND_LOCATIONS.csv"))
 
 # Get the total number of trips for each stand
