@@ -51,7 +51,7 @@ stand.summary <- stand.summary  %>%
     Longitude = Xstart,  
     Latitude = Ystart
   )
-write_csv(stand.summary,file.path(CHUNKSFOLDERPATH,"STAND_SUMMARY.csv"))
+#write_csv(stand.summary,file.path(CHUNKSFOLDERPATH,"STAND_SUMMARY.csv"))
 
 #################################################################
 # Calculate Waiting Times per stand
@@ -64,17 +64,20 @@ stand.lag <- NewDataXY %>%
 
 stand.lag <- drop_na(stand.lag,WAIT)
 
-# Calculate Meann waiting times per stand
-stand.lag.summary <- aggregate(stand.lag[,c("WAIT","TotalTime")],list(stand.lag$ORIGIN_STAND,stand.lag$WEEKEND),mean)
+# Calculate Mean waiting times per stand
+stand.lag.summary <- aggregate(stand.lag[,c("WAIT")],list(stand.lag$ORIGIN_STAND),mean)
 stand.lag.summary <- stand.lag.summary  %>% 
   rename(
-    STAND = Group.1,  
-    WEEKEND = Group.2
+    STAND = Group.1
   )
-stand.lag.summary <- merge(x=stand.lag.summary,y=Coordinates,by="STAND")
-stand.lag.summary <- stand.lag.summary  %>% 
-  rename(
-    Longitude = Xstart,  
-    Latitude = Ystart
-  )
+stand.lag.summary <- merge(x=stand.summary,y=stand.lag.summary,by="STAND")
+
 write_csv(stand.lag.summary,file.path(CHUNKSFOLDERPATH,"STAND_LAG_SUMMARY.csv"))
+
+
+#stand.lag.summary <- stand.lag.summary  %>% 
+# rename(
+#    Longitude = Xstart,  
+#    Latitude = Ystart
+#  )
+#write_csv(stand.lag.summary,file.path(CHUNKSFOLDERPATH,"STAND_LAG_SUMMARY.csv"))

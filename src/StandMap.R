@@ -18,8 +18,12 @@ dir.create("./data/output",showWarnings=FALSE)
 
 
 # Read Data
-TaxiStandP = file.path(CHUNKSFOLDERPATH,"STAND_SUMMARY.csv")
-TaxiStand = read_csv(file = TaxiStandP)
+#TaxiStandP = file.path(CHUNKSFOLDERPATH,"STAND_SUMMARY.csv")
+#stand.summary = read_csv(file = TaxiStandP)
+TaxiStandLagP = file.path(CHUNKSFOLDERPATH,"STAND_LAG_SUMMARY.csv")
+stand.lag.summary =read_csv(file = TaxiStandLagP)
+  
+TaxiStand = stand.lag.summary
 Z=rep(97,63)
 Data <- structure(list(Name = structure(1:63, .Label = paste0("T",sprintf("%s",1:63)), 
                                         class = "factor"), 
@@ -61,11 +65,20 @@ my_title <- tags$p(tags$style("p {color: blue; font-size:22px}"),
 mk<-mk %>% addControl(my_title, position = "bottomleft" )
 mapshot(mk, file = file.path(OUTPUTFOLDERPATH,"totaltime.png"))
 ##########################################################################
-# Average Time per trip in green
+# Average Time per trip in Purple
 ##########################################################################
 mt <- addCircleMarkers(m,radius=2 + TaxiStand$AVG_TRIP_TIME/min(TaxiStand$AVG_TRIP_TIME),color='purple')
 my_title <- tags$p(tags$style("p {color: purple; font-size:22px}"),
                    tags$b("Average Time Per Trip"))
 mt<-mt %>% addControl(my_title, position = "bottomleft" )
 mapshot(mt, file = file.path(OUTPUTFOLDERPATH,"avgtriptime.png"))
+
+##########################################################################
+# Mean Waiting Time in Green
+##########################################################################
+ml <- addCircleMarkers(m,radius=2 + 0.02*TaxiStand$WAIT/min(TaxiStand$WAIT),color='green')
+my_title <- tags$p(tags$style("p {color: green; font-size:22px}"),
+                   tags$b("Average Waiting Time"))
+ml<-ml %>% addControl(my_title, position = "bottomleft" )
+mapshot(ml, file = file.path(OUTPUTFOLDERPATH,"avgwaittime.png"))
 
