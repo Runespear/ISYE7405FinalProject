@@ -12,6 +12,7 @@
 library("pacman")
 p_load("readr","dplyr","stringr","rstudioapi","parallel","xtable","here","anytime")
 p_load("pracma","lubridate","ggplot2","tidyverse","remotes")
+p_load("reshape","lattice")
 
 # Set working directory to this script's location for RSTUDIO only
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -85,9 +86,19 @@ stand.lag.summary <- merge(x=stand.summary,y=stand.lag.summary,by="STAND")
 write_csv(stand.lag.summary,file.path(CHUNKSFOLDERPATH,"STAND_LAG_SUMMARY.csv"))
 
 
-#stand.lag.summary <- stand.lag.summary  %>% 
-# rename(
-#    Longitude = Xstart,  
-#    Latitude = Ystart
-#  )
-#write_csv(stand.lag.summary,file.path(CHUNKSFOLDERPATH,"STAND_LAG_SUMMARY.csv"))
+xyplot( WAIT ~ TIMESTAMP ,groups=ORIGIN_STAND, data=stand.lag,t="l")
+# Plot histogram of waiting times for each station
+pvec = c()
+step = 9
+for (i in 1:ceil(63/step)){
+  test.stand.lag <- stand.lag[which( (i-1)*step < stand.lag$ORIGIN_STAND & stand.lag$ORIGIN_STAND <= i*step ),]
+  p<-ggplot(test.stand.lag,aes(x=WAIT))+geom_histogram(binwidth=5,fill="white",colour="black")+
+    facet_wrap(~ORIGIN_STAND, scales = "free") + labs(title="Interarrival Times Histogram by station")
+  pname <- paste("HIST_WAIT_part",toString(i),".png",sep="")
+  png(file.path(OUTPUTFOLDERPATH,pname),width=1920,height=1080,type="cairo")
+  print(p)
+  dev.off()
+}
+
+
+
