@@ -20,6 +20,9 @@ and should include the train.csv file
 2. ExtractGPS.R + ./data/NewTaxiDataFiltered.csv -> ./data/chunks/NewDataXY_part1, ..., ./data/chunks/NewDataXY_part6,  ./data/chunks/XYticks_part1, ./data/chunks/XYticks_part2, ./data/chunks/XYticks_part3
 3. ExtractStartingLocation.R + ./data/chunks/NewDataXY_part1, ..., ./data/chunks/NewDataXY_part6 -> ./data/chunks/STAND_LOCATIONS.csv, ./data/NewDataXY.csv
 4. EDAFiguresTables.R + ./data/NewTaxiData.csv -> ./data/output/FigALL.png, ./data/output/Fig4.png, ./data/output/TableIILATEX.txt, ./data/output/TableILATEX.txt
+5. Stratify.R + ./data/NewDataXY.csv + ./data/chunks/STAND_LOCATIONS.csv -> ./data/chunks/WAITINGTIMES_part1.csv, .., ./data/chunks/WAITINGTIMES_part6.csv + ./data/chunks/STAND_LAG_SUMMARY.csv
+6. StandMap.R + STAND_LAG_SUMMARY.csv -> ./data/output/totaltrips.png, ./data/output/totaltime.png, ./data/output/avgtriptime.png, ./data/output/avgwaittime.png
+
 ```
 ## Exploratory Questions
 
