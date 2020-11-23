@@ -1,0 +1,8 @@
+
+> print(TableI)
+            TotalServicesEmerged AverageEarly AverageMID AverageLATE
+Workdays                 1206390     556.7143  1270.0204    928.6227
+Weekends                  423021     386.6731   288.9725    318.9063
+AllDaytypes              1629411     929.0746  1555.7166   1235.2993
+
+> sink()

@@ -74,17 +74,16 @@ png(file.path(OUTPUTFOLDERPATH,"FigALL.png"),width=1080,height=720,type="cairo")
 print(p1)
 dev.off()
 
-########################################################################
-# Calculate Waiting Times at each Taxi stand
-########################################################################
-TaxiStandData <- drop_na(NewTaxiData,ORIGIN_STAND)
-TaxiStandCount <- aggregate(TaxiStandData[,c("TotalTime","vones")],list(TaxiStandData$ORIGIN_STAND),sum)
-TaxiStandGrouped <- TaxiStandData %>% group_by(ORIGIN_STAND)
 
 #########################################################################
 # Generate Table II: Max,Min,Mean,SD of TotalRides and TotalTime
 ##########################################################################
-
+# Use filtered
+NewTaxiData <- read_csv(file.path(DATAFOLDERPATH,"NewTaxiDataFiltered.csv")) 
+# Sum up the TotaTime and TotalRides for each unique TAXI_ID
+summary.data <- aggregate(NewTaxiData[,c("TotalTime","vones")],list(NewTaxiData$TAXI_ID),sum)
+summary.data$TotalRides <- summary.data$vones
+summary.data$vones <- NULL
 
 TotalTimePD = summary.data$TotalTime
 TotalRidesPD = summary.data$TotalRides
@@ -100,7 +99,10 @@ TableII <- data.frame("ServicesPerDriver"=TableII.TotalRides,"TotalCruiseTime"=T
 row.names(TableII) <- c("Max","Min","Mean","SD")
 
 # Display TableII in R
-TableII
+
+sink(file.path(OUTPUTFOLDERPATH,"TableII.txt"))
+print(TableII)
+sink()
 # Export Table in LATEX format, 0 decimal place precision 
 TableII.LATEX <- xtable(TableII,digits=c(0,0,0))
 print(TableII.LATEX,include.rownames=TRUE,file=file.path(OUTPUTFOLDERPATH,"TableIILATEX.txt"))
@@ -148,6 +150,9 @@ row.names(TableI) <- c("Workdays","Weekends","AllDaytypes")
 
 TableI.LATEX <- xtable(TableI,digits=c(0,0,0,0,0))
 
+sink(file.path(OUTPUTFOLDERPATH,"TableI.txt"))
+print(TableI)
+sink()
 
 print(TableI.LATEX,include.rownames=TRUE,file=file.path(OUTPUTFOLDERPATH,"TableILATEX.txt"))
 

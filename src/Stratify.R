@@ -12,7 +12,7 @@
 library("pacman")
 p_load("readr","dplyr","stringr","rstudioapi","parallel","xtable","here","anytime")
 p_load("pracma","lubridate","ggplot2","tidyverse","remotes")
-p_load("reshape","lattice")
+p_load("reshape","lattice","dtwclust")
 
 # Set working directory to this script's location for RSTUDIO only
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -43,14 +43,14 @@ Coordinates <- read_csv(file.path(CHUNKSFOLDERPATH,"STAND_LOCATIONS.csv"))
 # Get the total number of trips for each stand
 stand.summary <- aggregate(NewDataXY[,c("TotalTime","vones")],list(NewDataXY$ORIGIN_STAND),sum)
 stand.summary <- stand.summary  %>% 
-  rename(
-    STAND = Group.1,  
-    TotalRides = vones
+  dplyr::rename(
+    STAND = 'Group.1',
+    TotalRides = 'vones'
   )
 stand.summary$AVG_TRIP_TIME <- stand.summary$TotalTime/stand.summary$TotalRides
 stand.summary <- merge(x=stand.summary,y=Coordinates,by="STAND")
 stand.summary <- stand.summary  %>% 
-  rename(
+  dplyr::rename(
     Longitude = Xstart,  
     Latitude = Ystart
   )
@@ -78,7 +78,7 @@ for (i in 1:6){
 # Calculate Mean waiting times per stand
 stand.lag.summary <- aggregate(stand.lag[,c("WAIT")],list(stand.lag$ORIGIN_STAND),mean)
 stand.lag.summary <- stand.lag.summary  %>% 
-  rename(
+  dplyr::rename(
     STAND = Group.1
   )
 stand.lag.summary <- merge(x=stand.summary,y=stand.lag.summary,by="STAND")
@@ -86,10 +86,18 @@ stand.lag.summary <- merge(x=stand.summary,y=stand.lag.summary,by="STAND")
 write_csv(stand.lag.summary,file.path(CHUNKSFOLDERPATH,"STAND_LAG_SUMMARY.csv"))
 
 
-xyplot( WAIT ~ TIMESTAMP ,groups=ORIGIN_STAND, data=stand.lag,t="l")
+# xyplot( WAIT ~ TIMESTAMP ,groups=ORIGIN_STAND, data=stand.lag,t="l")
 # Plot histogram of waiting times for each station
-pvec = c()
-step = 9
+get_hist <- function(p) {
+  d <- ggplot_build(p)$data[[1]]
+  data.frame(x = d$x, xmin = d$xmin, xmax = d$xmax, y = d$y)
+}
+histvec = c()
+
+############################
+# Waiting Times Histogram
+############################
+step = 30
 for (i in 1:ceil(63/step)){
   test.stand.lag <- stand.lag[which( (i-1)*step < stand.lag$ORIGIN_STAND & stand.lag$ORIGIN_STAND <= i*step ),]
   p<-ggplot(test.stand.lag,aes(x=WAIT))+geom_histogram(binwidth=5,fill="white",colour="black")+
@@ -98,7 +106,23 @@ for (i in 1:ceil(63/step)){
   png(file.path(OUTPUTFOLDERPATH,pname),width=1920,height=1080,type="cairo")
   print(p)
   dev.off()
+  #histvec <- c(histvec,get_hist(p))
 }
+############################
+# Travel Times Histogram
+############################
+step = 30
+for (i in 1:ceil(63/step)){
+  test.stand.lag <- stand.lag[which( (i-1)*step < stand.lag$ORIGIN_STAND & stand.lag$ORIGIN_STAND <= i*step ),]
+  p<-ggplot(test.stand.lag,aes(x=TotalTime))+geom_histogram(binwidth=5,fill="white",colour="black")+
+    facet_wrap(~ORIGIN_STAND, scales = "free") + labs(title="Travel Times Histogram by station")
+  pname <- paste("HIST_TOTALTIME_part",toString(i),".png",sep="")
+  png(file.path(OUTPUTFOLDERPATH,pname),width=1920,height=1080,type="cairo")
+  print(p)
+  dev.off()
+  #histvec <- c(histvec,get_hist(p))
+}
+
 
 
 

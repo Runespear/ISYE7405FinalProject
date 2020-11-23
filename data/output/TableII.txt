@@ -1,0 +1,9 @@
+
+> print(TableII)
+     ServicesPerDriver TotalCruiseTime
+Max           7468.000       118655.50
+Min              2.000           20.25
+Mean          3694.810        47101.42
+SD            1462.194        18035.34
+
+> sink()
