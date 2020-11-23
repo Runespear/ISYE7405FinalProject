@@ -149,3 +149,4 @@ ap <- autoplot(pca_res2, data = NewDataXY, colour = 'DAYOFWEEK',
 png(file.path(OUTPUTFOLDERPATH,"PCA_no_TOTALTIME.png"),width=1920,height=1080,res=100)
 print(ap)
 dev.off()
+
