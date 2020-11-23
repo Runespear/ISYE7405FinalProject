@@ -12,7 +12,8 @@
 library("pacman")
 p_load("readr","dplyr","stringr","rstudioapi","parallel","xtable","here","anytime")
 p_load("pracma","lubridate","ggplot2","tidyverse","remotes")
-p_load("reshape","lattice","dtwclust")
+p_load("reshape","lattice","dtwclust","ggfortify")
+p_load("FactoMineR","factoextra")
 
 # Set working directory to this script's location for RSTUDIO only
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -103,7 +104,7 @@ for (i in 1:ceil(63/step)){
   p<-ggplot(test.stand.lag,aes(x=WAIT))+geom_histogram(binwidth=5,fill="white",colour="black")+
     facet_wrap(~ORIGIN_STAND, scales = "free") + labs(title="Interarrival Times Histogram by station")
   pname <- paste("HIST_WAIT_part",toString(i),".png",sep="")
-  png(file.path(OUTPUTFOLDERPATH,pname),width=1920,height=1080,type="cairo")
+  png(file.path(OUTPUTFOLDERPATH,pname),width=3840,height=2160,type="cairo",res=100)
   print(p)
   dev.off()
   #histvec <- c(histvec,get_hist(p))
@@ -117,12 +118,34 @@ for (i in 1:ceil(63/step)){
   p<-ggplot(test.stand.lag,aes(x=TotalTime))+geom_histogram(binwidth=5,fill="white",colour="black")+
     facet_wrap(~ORIGIN_STAND, scales = "free") + labs(title="Travel Times Histogram by station")
   pname <- paste("HIST_TOTALTIME_part",toString(i),".png",sep="")
-  png(file.path(OUTPUTFOLDERPATH,pname),width=1920,height=1080,type="cairo")
+  png(file.path(OUTPUTFOLDERPATH,pname),width=3840,height=2160,type="cairo",res=100)
   print(p)
   dev.off()
   #histvec <- c(histvec,get_hist(p))
 }
 
 
+###########################
+# PCA of NewTaxiDataXY
+###########################
 
+# Exclude non numeric data
+PCAINPUT <- subset(NewDataXY, select=c(TotalTime,Xstart,Xend,Ystart,Yend,TotalTime))
+pca_res <- prcomp(PCAINPUT, scale. = TRUE)
 
+ap <- autoplot(pca_res, data = NewDataXY, colour = 'DAYOFWEEK',
+         loadings = TRUE, loadings.colour = 'blue',
+         loadings.label = TRUE, loadings.label.size = 3)
+png(file.path(OUTPUTFOLDERPATH,"PCA.png"),width=1920,height=1080,res=100)
+print(ap)
+dev.off()
+
+PCAINPUT2 <- subset(NewDataXY, select=c(Xstart,Xend,Ystart,Yend))
+pca_res2 <- prcomp(PCAINPUT2, scale. = TRUE)
+
+ap <- autoplot(pca_res2, data = NewDataXY, colour = 'DAYOFWEEK',
+               loadings = TRUE, loadings.colour = 'blue',
+               loadings.label = TRUE, loadings.label.size = 3)
+png(file.path(OUTPUTFOLDERPATH,"PCA_no_TOTALTIME.png"),width=1920,height=1080,res=100)
+print(ap)
+dev.off()
