@@ -13,7 +13,7 @@ library("pacman")
 p_load("readr","dplyr","stringr","rstudioapi","parallel","xtable","here","anytime")
 p_load("pracma","lubridate","ggplot2","tidyverse","remotes")
 p_load("reshape","lattice","dtwclust","ggfortify")
-p_load("FactoMineR","factoextra")
+p_load("FactoMineR","factoextra","HistDAWass")
 
 # Set working directory to this script's location for RSTUDIO only
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -93,8 +93,67 @@ get_hist <- function(p) {
   d <- ggplot_build(p)$data[[1]]
   data.frame(x = d$x, xmin = d$xmin, xmax = d$xmax, y = d$y)
 }
-histvec = c()
 
+
+#############################################
+# Hierarchical Clustering with L2Wasserstein
+#############################################
+station.list <- unique(stand.lag$ORIGIN_STAND)
+num.station <- length(station.list)
+
+WAIT.histvec <- vector("list",num.station)
+TotalTime.histvec <- vector("list",num.station)
+for (i in station.list){
+  strat <- as.data.frame(stand.lag[which(stand.lag$ORIGIN_STAND==i),c("TotalTime","WAIT")])
+  WAIT.histvec[[i]] <- data2hist(strat$WAIT)
+  TotalTime.histvec[[i]] <- data2hist(strat$TotalTime)
+}
+
+WAIT.MatH <- new("MatH", nrows=num.station, ncols=1, ListOfDist=WAIT.histvec, names.rows=station.list, names.cols="density")
+TotalTime.MatH <- new("MatH", nrows=num.station, ncols=1, ListOfDist=TotalTime.histvec, names.rows=station.list, names.cols="density")
+
+# Loop to see quality increase
+# Clustering for Waiting Times
+WAIT.df = data.frame()
+for(i in 3:10) {
+  WAIT.df = rbind(WAIT.df, data.frame(n_clust = i, quality = WH_kmeans(WAIT.MatH, k=i)$quality))
+}
+WAIT.p<-ggplot(WAIT.df, aes(x=n_clust, y=quality)) + geom_point(size=4) + geom_line() +labs(title="WAIT Cluster Quality")
+pname <- paste("WAITQuality.png")
+png(file.path(OUTPUTFOLDERPATH,pname),width=1080,height=720,type="cairo",res=100)
+print(WAIT.p)
+dev.off()
+WAIT.decision <- WH_kmeans(WAIT.MatH, k=6)
+WAIT.decision.clusters <- unname(WAIT.decision$solution$IDX)
+
+# Clusterin for TotalTime
+TotalTime.df = data.frame()
+for(i in 3:10) {
+  TotalTime.df = rbind(TotalTime.df, data.frame(n_clust = i, quality = WH_kmeans(TotalTime.MatH, k=i)$quality))
+}
+TotalTime.p<-ggplot(TotalTime.df, aes(x=n_clust, y=quality)) + geom_point(size=4) + geom_line() +labs(title="TotalTime Cluster Quality")
+pname <- paste("TotalTimeQuality.png")
+png(file.path(OUTPUTFOLDERPATH,pname),width=1080,height=720,type="cairo",res=100)
+print(TotalTime.p)
+dev.off()
+TotalTime.decision <- WH_kmeans(TotalTime.MatH, k=7)
+TotalTime.decision.clusters <- unname(TotalTime.decision$solution$IDX)
+
+clusters.df <- data.frame("ORIGIN_STAND"=station.list,"TotalTime.clusters"=TotalTime.decision.clusters,"WAIT.clusters"=WAIT.decision.clusters)
+cluster.fname <- "cluster_assignment.csv"
+cluster.path <- file.path(CHUNKSFOLDERPATH,cluster.fname)
+write_csv(clusters.df,cluster.path,cluster.path)
+
+#cluster.TABLE <- xtable(clusters.df,digits=c(0,0,0,0))
+
+sink(file.path(OUTPUTFOLDERPATH,"clusterTABLE.txt"))
+print(xtable(clusters.df,digits=c(0,0,0,0)),include.rownames=FALSE,file=file.path(OUTPUTFOLDERPATH,"clusterTABLE.txt"))
+sink()
+
+
+
+
+break
 ############################
 # Waiting Times Histogram
 ############################
@@ -113,6 +172,7 @@ for (i in 1:ceil(63/step)){
 # Travel Times Histogram
 ############################
 step = 30
+#test.stand.lag.vec <- c()
 for (i in 1:ceil(63/step)){
   test.stand.lag <- stand.lag[which( (i-1)*step < stand.lag$ORIGIN_STAND & stand.lag$ORIGIN_STAND <= i*step ),]
   p<-ggplot(test.stand.lag,aes(x=TotalTime))+geom_histogram(binwidth=5,fill="white",colour="black")+
@@ -121,7 +181,7 @@ for (i in 1:ceil(63/step)){
   png(file.path(OUTPUTFOLDERPATH,pname),width=3840,height=2160,type="cairo",res=100)
   print(p)
   dev.off()
-  #histvec <- c(histvec,get_hist(p))
+  #test.stand.lag.vec <- c(test.stand.lag,test.stand.lag)
 }
 
 
